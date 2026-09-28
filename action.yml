@@ -1,6 +1,6 @@
 name: PantheonSim
 description: Run CUDA and HIP tests on simulated NVIDIA and AMD GPUs, on GitHub's standard runners, with no GPU.
-author: PantheonGPU
+author: PantheonSim
 branding:
   icon: cpu
   color: green
