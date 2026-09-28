@@ -32,7 +32,10 @@ inputs:
   library-path:
     description: >
       `true` puts the simulator's libraries on LD_LIBRARY_PATH so programs run
-      directly (ctest, scripts) as well as under `vgpu run`.
+      directly (ctest, scripts) as well as under `vgpu run`. Use `false`, and
+      run the tests under `vgpu run`, when the job links against the toolkit's
+      own cuBLAS, cuSPARSE, cuFFT and so on: with `true` the linker resolves
+      their dependencies to the simulator's libraries and the link fails.
     default: 'true'
 
 outputs:
