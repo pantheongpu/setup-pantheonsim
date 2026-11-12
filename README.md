@@ -48,8 +48,8 @@ Name an AMD Instinct card and the action installs ROCm's own `hipcc`:
 
 ## CMake and ctest
 
-Projects build and test as they are. CMake's own CUDA and HIP language
-support works, and `ctest` runs the programs directly:
+Projects build and test as they are. CMake's own CUDA language support
+works, and `ctest` runs the programs directly:
 
 ```yaml
       - uses: pantheongpu/setup-pantheonsim@v0
@@ -61,11 +61,17 @@ support works, and `ctest` runs the programs directly:
           ctest --test-dir build --output-on-failure
 ```
 
+For HIP, the action installs only ROCm's compiler: it extracts `hsa-rocr-dev`
+(the HSA runtime's CMake config) but not `hsa-rocr` (the `libhsa-runtime64.so`
+it names), and not `comgr`. Projects that call `find_package(hip)` have had to
+install `comgr` and `hsa-rocr` from AMD's repository (already configured by
+the action) in a step after this one.
+
 ## Inputs
 
 | Input | Default | Meaning |
 | --- | --- | --- |
-| `gpu` | `nvidia/t4` | The GPU to simulate: `nvidia/t4`, `nvidia/a100`, `nvidia/h100`, `nvidia/b200`, `amd/mi300x`, `amd/mi350x` and [more](https://pantheonsim.com/#gpus) |
+| `gpu` | `nvidia/t4` | The GPU to simulate: `nvidia/t4`, `nvidia/a100`, `nvidia/h100`, `nvidia/b200`, `amd/mi300x`, `amd/mi350x` and [all 48](https://pantheonsim.com/gpus/) |
 | `count` | `1` | How many GPUs |
 | `cuda-toolkit` | `apt` on 24.04, `12.6` on 22.04 | `apt` installs Ubuntu's toolkit; `12.6` or `13.0` installs that `nvcc` from NVIDIA; `none` uses one the job already installed |
 | `rocm` | `7.1` for AMD | The ROCm version whose `hipcc` to install; `none` uses one the job already installed |
@@ -80,9 +86,17 @@ support works, and `ctest` runs the programs directly:
   run on physical GPUs before a release.
 - **Check return codes in your tests.** An unsupported call returns its CUDA or
   HIP error and prints why, so a test that ignores the code can still pass.
-- **PyTorch: the ROCm build runs, the CUDA build doesn't.** PyTorch for ROCm
-  loads on a simulated MI300X and runs common ops through its libraries;
-  PyTorch for CUDA's bundled runtime refuses a simulated driver. Numba works.
+- **PyTorch.** PyTorch for ROCm loads on
+  a simulated MI300X and runs common ops through its libraries. PyTorch's
+  CUDA 13 build needs `cuda-toolkit: '13.0'` (the simulator's libraries take
+  their sonames from the job's toolkit) and runs only under
+  `vgpu run --preload`: run directly, it loads
+  NVIDIA's own CUDA runtime, which finds no driver. Under `--preload`,
+  importing some packages crashes
+  ([pantheonsim#597](https://github.com/pantheongpu/pantheonsim/issues/597)).
+  Numba works.
+- **Known limits.** What does not work, each with its issue, is in
+  [docs/status.md](https://github.com/pantheongpu/pantheonsim/blob/main/docs/status.md).
 - **Linux runners only.** Container jobs work too. The first run builds the
   simulator; later runs restore it from the cache.
 
