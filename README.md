@@ -83,9 +83,15 @@ support works, and `ctest` runs the programs directly:
 - **PyTorch: the ROCm build runs, the CUDA build doesn't.** PyTorch for ROCm
   loads on a simulated MI300X and runs common ops through its libraries;
   PyTorch for CUDA's bundled runtime refuses a simulated driver. Numba works.
-- **Linux runners only.** Container jobs work too.
-- **The first run takes 8 to 23 minutes.** It builds the simulator; later runs
-  restore it from the cache. See [Setup time](#setup-time).
+- **Linux runners only.** Container jobs work too. The first run builds the
+  simulator; later runs restore it from the cache.
+
+## Versions
+
+`@v0` follows the latest `v0.x.y` release. Each release pins a simulator
+version that was tested with it, so nothing changes under your workflow
+until you move to a new release. Pin an exact release, such as `@v0.1.0`,
+to control when that happens.
 
 ## Setup time
 
@@ -109,13 +115,6 @@ again. Releases of the simulator are gaining prebuilt binaries
 once this action pins one of those, a first run downloads and checks the
 binary instead of building it (the whole step took 0.5 to 3 minutes in the
 simulator's checks of those binaries), with nothing to change in your workflow.
-
-## Versions
-
-`@v0` follows the latest `v0.x.y` release. Each release pins a simulator
-version that was tested with it, so nothing changes under your workflow
-until you move to a new release. Pin an exact release, such as `@v0.1.0`,
-to control when that happens.
 
 More detail: [pantheonsim.com/ci](https://pantheonsim.com/ci/).
 Questions and bugs: [pantheongpu/pantheonsim](https://github.com/pantheongpu/pantheonsim/issues).
