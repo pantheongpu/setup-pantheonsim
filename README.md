@@ -107,6 +107,29 @@ version that was tested with it, so nothing changes under your workflow
 until you move to a new release. Pin an exact release, such as `@v0.1.0`,
 to control when that happens.
 
+## Setup time
+
+The action step, measured on GitHub's hosted runners in this repository's
+[tests](https://github.com/pantheongpu/setup-pantheonsim/actions/workflows/test.yml)
+(6 runs, 2026-10-27 to 2026-11-12) and the simulator's own
+[action tests](https://github.com/pantheongpu/pantheonsim/actions/workflows/action.yml)
+(9 runs, 2026-11-11 and 12):
+
+| Runner, GPU | First run (builds the simulator) | Later runs (from the cache) |
+| --- | --- | --- |
+| `ubuntu-24.04`, NVIDIA | 13 to 22 min | 1.3 to 1.8 min |
+| `ubuntu-24.04`, AMD | 8 to 13 min | 0.6 to 0.7 min |
+| `ubuntu-22.04`, NVIDIA | 18 to 23 min | 3.0 min |
+| `ubuntu-22.04`, AMD | 9 to 15 min | 0.8 min |
+
+The cache belongs to your repository and is keyed on the simulator's source,
+so the first run after moving to a new release of this action is a first run
+again. Releases of the simulator are gaining prebuilt binaries
+([pantheongpu/pantheonsim#599](https://github.com/pantheongpu/pantheonsim/issues/599)):
+once this action pins one of those, a first run downloads and checks the
+binary instead of building it (the whole step took 0.5 to 3 minutes in the
+simulator's checks of those binaries), with nothing to change in your workflow.
+
 More detail: [pantheonsim.com/ci](https://pantheonsim.com/ci/).
 Questions and bugs: [pantheongpu/pantheonsim](https://github.com/pantheongpu/pantheonsim/issues).
 
